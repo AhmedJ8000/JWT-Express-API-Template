@@ -6,7 +6,12 @@ const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
 const logger = require('morgan');
+
+// Controllers
 const authCtrl = require('./controllers/auth');
+
+// Middleware
+const verifyToken = require('./middleware/verify-token');
 
 mongoose.connect(process.env.MONGODB_URI);
 
@@ -20,7 +25,14 @@ app.use(logger('dev'));
 
 // Public Routes
 app.use('/auth', authCtrl);
+
 // Protected Routes
+app.use(verifyToken);
+
+app.get('/test', async (req, res) =>{
+console.log(req.user);
+res.status(201).json({msg: 'You are logged in'});
+});
 
 app.listen(process.env.PORT || 3000, () => {
     console.log('The express app is ready!');
